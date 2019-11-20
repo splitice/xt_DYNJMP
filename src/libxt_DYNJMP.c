@@ -33,7 +33,7 @@ static struct xtables_target ct_target_reg[] = {
 		.version       = XTABLES_VERSION,
 		.size          = XT_ALIGN(sizeof(struct xt_DYNJMP_target_info)),
      	.save		= ct_save,
-		.userspacesize = offsetof(struct xt_DYNJMP_target_info, ct),
+		.userspacesize = offsetof(struct xt_DYNJMP_target_info, mode),
 	}
 };
 
