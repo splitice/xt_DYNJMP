@@ -1,0 +1,42 @@
+# .travis.yml for ipt-netflow
+
+language: c
+dist: xenial
+services:
+  - docker
+
+addons:
+  apt:
+    update: true
+    packages:
+      - pkg-config
+      - module-assistant
+      - iptables-dev
+      - snmpd
+      - libsnmp-dev
+
+matrix:
+  include:
+    - name: x86_64 CentOS 7.4.1708
+      env: OS_NAME=centos OS_VERSION=7.4.1708
+    - name: x86_64 CentOS 7.3.1611
+      env: OS_NAME=centos OS_VERSION=7.3.1611
+
+
+install:
+  - if [ -z "$OS_NAME" ]; then
+      ( set -x; sudo m-a prepare );
+    else
+      ( set -x;
+        sudo docker pull ${OS_NAME}:${OS_VERSION};
+        sudo docker build --no-cache --rm --file=travis/Dockerfile.${OS_NAME} --build-arg=OS_VERSION=${OS_VERSION} --tag=${OS_NAME}-${OS_VERSION}:test .;
+      );
+    fi
+
+script:
+  - if [ -z "$OS_NAME" ]; then
+      ( set -x; ./configure && make all && sudo make install );
+    else
+      ( set -x; sudo docker run -v $PWD:$PWD -w $PWD ${OS_NAME}-${OS_VERSION}:test );
+    fi
+
