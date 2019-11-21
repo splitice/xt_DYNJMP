@@ -21,8 +21,7 @@ DYNJMP_tg(struct sk_buff *skb, const struct xt_action_param *par)
 	/* This is the raw table, we will need to do some checks */
 	iph = ip_hdr(skb);
 	
-	uint8_t mask = 0xFF; // todo cidr
-	uint8_t upperBytes = ((iph->daddr & mask) & 0xFF);
+	uint8_t upperBytes = htonl(iph->daddr) & 0xFF;
 	unsigned int ret = 0xFF | (upperBytes << 8);
 	return ret;
 }
