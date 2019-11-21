@@ -33,7 +33,16 @@ static struct xtables_target ct_target_reg[] = {
 		.version       = XTABLES_VERSION,
 		.size          = XT_ALIGN(sizeof(struct xt_DYNJMP_target_info)),
      	.save		   = dynjmp_save,
-		.userspacesize = offsetof(struct xt_DYNJMP_target_info, mode),
+		.userspacesize = 0,
+	},
+	{
+		.family        = NFPROTO_UNSPEC,
+		.name          = "SYNJMP",
+		.revision      = 0,
+		.version       = XTABLES_VERSION,
+		.size          = XT_ALIGN(sizeof(struct xt_DYNJMP_target_info)),
+     	.save		   = dynjmp_save,
+		.userspacesize = 0,
 	}
 };
 

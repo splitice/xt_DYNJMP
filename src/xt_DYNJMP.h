@@ -4,7 +4,6 @@
 #include <linux/types.h>
 
 struct xt_DYNJMP_target_info {
-    uint8_t mode;
 };
 
 #endif

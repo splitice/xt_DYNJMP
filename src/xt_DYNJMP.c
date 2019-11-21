@@ -13,6 +13,12 @@
 #include <net/netfilter/nf_conntrack_zones.h>
 #include "xt_DYNJMP.h"
 
+MODULE_ALIAS("ipt_DYNJMP");
+MODULE_ALIAS("ip6t_DYNJMP");
+MODULE_ALIAS("xt_SYNJMP");
+MODULE_ALIAS("ipt_SYNJMP");
+MODULE_ALIAS("ip6t_SYNJMP");
+
 static unsigned int
 DYNJMP_tg(struct sk_buff *skb, const struct xt_action_param *par)
 {
@@ -22,6 +28,19 @@ DYNJMP_tg(struct sk_buff *skb, const struct xt_action_param *par)
 	iph = ip_hdr(skb);
 	
 	uint8_t upperBytes = htonl(iph->daddr) & 0xFF;
+	unsigned int ret = 0xFF | (upperBytes << 8);
+	return ret;
+}
+
+static unsigned int
+SYNJMP_tg(struct sk_buff *skb, const struct xt_action_param *par)
+{
+	const struct iphdr *iph;
+	
+	/* This is the raw table, we will need to do some checks */
+	iph = ip_hdr(skb);
+	
+	uint8_t upperBytes = htonl(iph->saddr) & 0xFF;
 	unsigned int ret = 0xFF | (upperBytes << 8);
 	return ret;
 }
@@ -36,7 +55,8 @@ static void xt_DYNJMP_tg_destroy_v0(const struct xt_tgdtor_param *par)
 {
 }
 
-static struct xt_target DYNJMP_tg_reg __read_mostly = {
+static struct xt_target dynjmp_tg_reg[] __read_mostly = {
+	{
 	.name		= "DYNJMP",
 	.revision	= 0,
 	.family		= NFPROTO_UNSPEC,
@@ -44,23 +64,30 @@ static struct xt_target DYNJMP_tg_reg __read_mostly = {
 	.target		= DYNJMP_tg,
 	.destroy	= xt_DYNJMP_tg_destroy_v0,
 	.targetsize     = sizeof(struct xt_DYNJMP_target_info),
-	.me		= THIS_MODULE,
+	.me		= THIS_MODULE
+	},
+	{
+	.name		= "SYNJMP",
+	.revision	= 0,
+	.family		= NFPROTO_UNSPEC,
+	.checkentry	= DYNJMP_chk,
+	.target		= SYNJMP_tg,
+	.destroy	= xt_DYNJMP_tg_destroy_v0,
+	.targetsize     = sizeof(struct xt_DYNJMP_target_info),
+	.me		= THIS_MODULE
+	}
 };
 
 static int __init xt_ct_tg_init(void)
 {
 	int ret;
 
-	ret = xt_register_target(&DYNJMP_tg_reg);
-	if (ret < 0)
-		return ret;
-
-	return 0;
+	return xt_register_targets(dynjmp_tg_reg, ARRAY_SIZE(dynjmp_tg_reg));
 }
 
 static void __exit xt_ct_tg_exit(void)
 {
-	xt_unregister_target(&DYNJMP_tg_reg);
+	xt_unregister_targets(dynjmp_tg_reg, ARRAY_SIZE(dynjmp_tg_reg));
 }
 
 module_init(xt_ct_tg_init);
