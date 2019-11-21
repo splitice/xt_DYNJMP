@@ -45,7 +45,6 @@ static struct xt_target DYNJMP_tg_reg __read_mostly = {
 	.target		= DYNJMP_tg,
 	.destroy	= xt_DYNJMP_tg_destroy_v0,
 	.targetsize     = sizeof(struct xt_DYNJMP_target_info),
-	.table		= "raw",
 	.me		= THIS_MODULE,
 };
 
