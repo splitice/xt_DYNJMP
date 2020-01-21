@@ -19,8 +19,6 @@ matrix:
   include:
     - name: x86_64 CentOS 7.4.1708
       env: OS_NAME=centos OS_VERSION=7.4.1708
-    - name: x86_64 CentOS 7.3.1611
-      env: OS_NAME=centos OS_VERSION=7.3.1611
 
 
 install:

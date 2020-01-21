@@ -47,6 +47,8 @@ SYNJMP_tg(struct sk_buff *skb, const struct xt_action_param *par)
 
 static int DYNJMP_chk(const struct xt_tgchk_param *par)
 {
+	const struct xt_DYNJMP_target_info *info = par->targinfo;
+	memset(&info->offsets, 0, sizeof(info->offsets));
 	return 0;
 }
 
