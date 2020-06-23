@@ -45,9 +45,9 @@ SYNJMP_tg(struct sk_buff *skb, const struct xt_action_param *par)
 	return ret;
 }
 
-static int DYNJMP_chk(const struct xt_tgchk_param *par)
+static void DYNJMP_init(struct xt_entry_target *par)
 {
-	const struct xt_DYNJMP_target_info *info = par->targinfo;
+	struct xt_DYNJMP_target_info *info = par->data;
 	memset(&info, 0, sizeof(info));
 	info->size = 256;
 	return 0;
@@ -63,7 +63,7 @@ static struct xt_target dynjmp_tg_reg[] __read_mostly = {
 	.name		= "DYNJMP",
 	.revision	= 0,
 	.family		= NFPROTO_UNSPEC,
-	.checkentry	= DYNJMP_chk,
+	.init   	= DYNJMP_init,
 	.target		= DYNJMP_tg,
 	.destroy	= xt_DYNJMP_tg_destroy_v0,
 	.targetsize     = sizeof(struct xt_DYNJMP_target_info),
@@ -73,7 +73,7 @@ static struct xt_target dynjmp_tg_reg[] __read_mostly = {
 	.name		= "SYNJMP",
 	.revision	= 0,
 	.family		= NFPROTO_UNSPEC,
-	.checkentry	= DYNJMP_chk,
+	.init   	= DYNJMP_init,
 	.target		= SYNJMP_tg,
 	.destroy	= xt_DYNJMP_tg_destroy_v0,
 	.targetsize     = sizeof(struct xt_DYNJMP_target_info),
