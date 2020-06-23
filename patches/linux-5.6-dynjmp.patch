@@ -1,8 +1,8 @@
 diff --git a/net/ipv4/netfilter/ip_tables.c b/net/ipv4/netfilter/ip_tables.c
-index 10b91ebdf213..f4d069d9d5d9 100644
+index 10b91ebdf213..2299b061369c 100644
 --- a/net/ipv4/netfilter/ip_tables.c
 +++ b/net/ipv4/netfilter/ip_tables.c
-@@ -220,6 +220,41 @@ struct ipt_entry *ipt_next_entry(const struct ipt_entry *entry)
+@@ -220,6 +220,43 @@ struct ipt_entry *ipt_next_entry(const struct ipt_entry *entry)
  	return (void *)entry + entry->next_offset;
  }
  
@@ -11,8 +11,10 @@ index 10b91ebdf213..f4d069d9d5d9 100644
 +{
 +	struct ipt_entry *entry = start;
 +	uint16_t i; uint32_t t;
-+	if(unlikely(cache_size == 0 || offset_cache[0] == 0)){
-+		if(cache_size == 0){
++	uint32_t length = offset_cache[0];
++	if(length > cache_size) length = cache_size;
++	if(unlikely(length == 0 || offset_cache[1] == 0)){
++		if(length == 0){
 +			do {
 +				if(entry->next_offset == 0) {
 +                                        return entry;
@@ -27,14 +29,14 @@ index 10b91ebdf213..f4d069d9d5d9 100644
 +					break;
 +				}
 +				entry = (void *)entry + entry->next_offset;
-+				offset_cache[i++] = (uint32_t)(((void*)entry) - ((void*)start));
++				offset_cache[++i] = (uint32_t)(((void*)entry) - ((void*)start));
 +			} while(i != cache_size);
 +		}
 +	}
 +	if(unlikely(count >= cache_size)){
 +		return NULL;
 +	}
-+	t = offset_cache[count];
++	t = offset_cache[count + 1];
 +	if(unlikely(!t)) {
 +		return NULL;
 +	}
@@ -44,7 +46,7 @@ index 10b91ebdf213..f4d069d9d5d9 100644
  /* Returns one of the generic firewall policies, like NF_ACCEPT. */
  unsigned int
  ipt_do_table(struct sk_buff *skb,
-@@ -233,7 +268,7 @@ ipt_do_table(struct sk_buff *skb,
+@@ -233,7 +270,7 @@ ipt_do_table(struct sk_buff *skb,
  	unsigned int verdict = NF_DROP;
  	const char *indev, *outdev;
  	const void *table_base;
@@ -53,7 +55,7 @@ index 10b91ebdf213..f4d069d9d5d9 100644
  	unsigned int stackidx, cpu;
  	const struct xt_table_info *private;
  	struct xt_action_param acpar;
-@@ -276,7 +311,7 @@ ipt_do_table(struct sk_buff *skb,
+@@ -276,7 +313,7 @@ ipt_do_table(struct sk_buff *skb,
  	e = get_entry(table_base, private->hook_entry[hook]);
  
  	do {
@@ -62,7 +64,7 @@ index 10b91ebdf213..f4d069d9d5d9 100644
  		const struct xt_entry_match *ematch;
  		struct xt_counters *counter;
  
-@@ -298,7 +333,7 @@ ipt_do_table(struct sk_buff *skb,
+@@ -298,7 +335,7 @@ ipt_do_table(struct sk_buff *skb,
  		counter = xt_get_this_cpu_counter(&e->counters);
  		ADD_COUNTER(*counter, skb->len, 1);
  
@@ -71,13 +73,13 @@ index 10b91ebdf213..f4d069d9d5d9 100644
  		WARN_ON(!t->u.kernel.target);
  
  #if IS_ENABLED(CONFIG_NETFILTER_XT_TARGET_TRACE)
-@@ -348,6 +383,15 @@ ipt_do_table(struct sk_buff *skb,
+@@ -348,6 +385,15 @@ ipt_do_table(struct sk_buff *skb,
  			/* Target might have changed stuff. */
  			ip = ip_hdr(skb);
  			e = ipt_next_entry(e);
-+		} else if(verdict & 0xFF) {
++		} else if(verdict & 0xFF00) {
 +			verdict = verdict >> 8;
-+			tmpe = ipt_n_entry(e, (uint32_t*)t->data, t->u.kernel.target->targetsize/sizeof(uint32_t), verdict);
++			tmpe = ipt_n_entry(e, (uint32_t*)t->data, (t->u.kernel.target->targetsize/sizeof(uint32_t))-1, verdict);
 +			if(unlikely(tmpe == e || tmpe == NULL)) {
 +				verdict = NF_ACCEPT;
 +				break;
