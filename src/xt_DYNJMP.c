@@ -28,6 +28,7 @@ DYNJMP_tg(struct sk_buff *skb, const struct xt_action_param *par)
 	iph = ip_hdr(skb);
 	
 	uint8_t upperBytes = htonl(iph->daddr) & 0xFF;
+	if(unlikely(upperBytes == 0)) return XT_CONTINUE;
 	unsigned int ret = 0xFF | (upperBytes << 8);
 	return ret;
 }
@@ -41,6 +42,7 @@ SYNJMP_tg(struct sk_buff *skb, const struct xt_action_param *par)
 	iph = ip_hdr(skb);
 	
 	uint8_t upperBytes = htonl(iph->saddr) & 0xFF;
+	if(unlikely(upperBytes == 0)) return XT_CONTINUE;
 	unsigned int ret = 0xFF | (upperBytes << 8);
 	return ret;
 }
