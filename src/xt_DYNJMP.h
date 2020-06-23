@@ -4,6 +4,7 @@
 #include <linux/types.h>
 
 struct xt_DYNJMP_target_info {
+    uint32_t size;
     uint32_t offsets[256];
 };
 
