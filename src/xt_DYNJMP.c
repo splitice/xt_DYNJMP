@@ -27,6 +27,7 @@ DYNJMP_tg(struct sk_buff *skb, const struct xt_action_param *par)
 	
 	/* This is the raw table, we will need to do some checks */
 	iph = ip_hdr(skb);
+	if(unlikely(iph == NULL)) return XT_DROP;
 	
 	uint8_t upperBytes = htonl(iph->daddr) & 0xFF;
 	if(unlikely(upperBytes == 0)) return XT_CONTINUE;
@@ -41,6 +42,7 @@ SYNJMP_tg(struct sk_buff *skb, const struct xt_action_param *par)
 	
 	/* This is the raw table, we will need to do some checks */
 	iph = ip_hdr(skb);
+	if(unlikely(iph == NULL)) return XT_DROP;
 	
 	uint8_t upperBytes = htonl(iph->saddr) & 0xFF;
 	if(unlikely(upperBytes == 0)) return XT_CONTINUE;
@@ -51,9 +53,13 @@ SYNJMP_tg(struct sk_buff *skb, const struct xt_action_param *par)
 static int DYNJMP_chk(const struct xt_tgchk_param *par)
 {
 	struct xt_DYNJMP_target_info *info = par->targinfo;
+	pr_warn("chk entry");
 	memset(info, 0, sizeof(*info));
 #if LINUX_VERSION_CODE > KERNEL_VERSION(5,7,0)
 	info->size = 256;
+	barrier();
+	info->set = 0;
+	barrier();
 #endif
 	return 0;
 }
