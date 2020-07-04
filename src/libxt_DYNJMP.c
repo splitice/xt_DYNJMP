@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <xtables.h>
+#include <linux/version.h>
 #include <linux/netfilter/nf_conntrack_common.h>
 #include "xt_DYNJMP.h"
 
