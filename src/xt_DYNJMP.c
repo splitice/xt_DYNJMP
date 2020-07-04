@@ -25,11 +25,10 @@ DYNJMP_tg(struct sk_buff *skb, const struct xt_action_param *par)
 {
 	const struct iphdr *iph;
 	
-	/* This is the raw table, we will need to do some checks */
 	iph = ip_hdr(skb);
 	if(unlikely(iph == NULL)) return NF_DROP;
 	
-	uint8_t upperBytes = htonl(iph->daddr) & 0xFF;
+	uint8_t upperBytes = ntohl(iph->daddr) & 0xFF;
 	if(unlikely(upperBytes == 0)) return XT_CONTINUE;
 	unsigned int ret = 0xFF | (upperBytes << 8);
 	return ret;
@@ -40,11 +39,10 @@ SYNJMP_tg(struct sk_buff *skb, const struct xt_action_param *par)
 {
 	const struct iphdr *iph;
 	
-	/* This is the raw table, we will need to do some checks */
 	iph = ip_hdr(skb);
 	if(unlikely(iph == NULL)) return NF_DROP;
 	
-	uint8_t upperBytes = htonl(iph->saddr) & 0xFF;
+	uint8_t upperBytes = ntohl(iph->saddr) & 0xFF;
 	if(unlikely(upperBytes == 0)) return XT_CONTINUE;
 	unsigned int ret = 0xFF | (upperBytes << 8);
 	return ret;
@@ -53,7 +51,7 @@ SYNJMP_tg(struct sk_buff *skb, const struct xt_action_param *par)
 static int DYNJMP_chk(const struct xt_tgchk_param *par)
 {
 	struct xt_DYNJMP_target_info *info = par->targinfo;
-	pr_warn("chk entry");
+	
 	memset(info, 0, sizeof(*info));
 #if LINUX_VERSION_CODE > KERNEL_VERSION(5,7,0)
 	info->size = 256;
@@ -64,11 +62,6 @@ static int DYNJMP_chk(const struct xt_tgchk_param *par)
 	return 0;
 }
 
-
-static void xt_DYNJMP_tg_destroy_v0(const struct xt_tgdtor_param *par)
-{
-}
-
 static struct xt_target dynjmp_tg_reg[] __read_mostly = {
 	{
 	.name		= "DYNJMP",
@@ -76,7 +69,6 @@ static struct xt_target dynjmp_tg_reg[] __read_mostly = {
 	.family		= NFPROTO_UNSPEC,
 	.checkentry	= DYNJMP_chk,
 	.target		= DYNJMP_tg,
-	.destroy	= xt_DYNJMP_tg_destroy_v0,
 	.targetsize     = sizeof(struct xt_DYNJMP_target_info),
 	.me		= THIS_MODULE
 	},
@@ -86,7 +78,6 @@ static struct xt_target dynjmp_tg_reg[] __read_mostly = {
 	.family		= NFPROTO_UNSPEC,
 	.checkentry	= DYNJMP_chk,
 	.target		= SYNJMP_tg,
-	.destroy	= xt_DYNJMP_tg_destroy_v0,
 	.targetsize     = sizeof(struct xt_DYNJMP_target_info),
 	.me		= THIS_MODULE
 	}
