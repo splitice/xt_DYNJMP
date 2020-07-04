@@ -11,6 +11,7 @@
 #include <linux/netfilter/x_tables.h>
 #include <net/netfilter/nf_conntrack.h>
 #include <net/netfilter/nf_conntrack_zones.h>
+#include <linux/version.h>
 #include "xt_DYNJMP.h"
 
 MODULE_ALIAS("ipt_DYNJMP");
