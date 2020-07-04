@@ -27,7 +27,7 @@ DYNJMP_tg(struct sk_buff *skb, const struct xt_action_param *par)
 	
 	/* This is the raw table, we will need to do some checks */
 	iph = ip_hdr(skb);
-	if(unlikely(iph == NULL)) return XT_DROP;
+	if(unlikely(iph == NULL)) return NF_DROP;
 	
 	uint8_t upperBytes = htonl(iph->daddr) & 0xFF;
 	if(unlikely(upperBytes == 0)) return XT_CONTINUE;
@@ -42,7 +42,7 @@ SYNJMP_tg(struct sk_buff *skb, const struct xt_action_param *par)
 	
 	/* This is the raw table, we will need to do some checks */
 	iph = ip_hdr(skb);
-	if(unlikely(iph == NULL)) return XT_DROP;
+	if(unlikely(iph == NULL)) return NF_DROP;
 	
 	uint8_t upperBytes = htonl(iph->saddr) & 0xFF;
 	if(unlikely(upperBytes == 0)) return XT_CONTINUE;
