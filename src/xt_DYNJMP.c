@@ -51,7 +51,9 @@ static int DYNJMP_chk(const struct xt_tgchk_param *par)
 {
 	struct xt_DYNJMP_target_info *info = par->targinfo;
 	memset(info, 0, sizeof(*info));
+#if LINUX_VERSION_CODE > KERNEL_VERSION(5,7,0)
 	info->size = 256;
+#endif
 	return 0;
 }
 
