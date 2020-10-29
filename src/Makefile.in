@@ -43,7 +43,7 @@ libxt_DYNJMP_sh.o: libxt_DYNJMP.c
 
 
 %.so: %_sh.o
-	gcc -shared -o $@ $<
+	gcc -shared -lxtables -o $@ $<
 
 linstall: | libxt_DYNJMP.so
 	@echo " *"
