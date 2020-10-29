@@ -77,7 +77,7 @@ index 10b91ebdf213..2299b061369c 100644
  			/* Target might have changed stuff. */
  			ip = ip_hdr(skb);
  			e = ipt_next_entry(e);
-+		} else if(verdict & 0xFF00) {
++		} else if(verdict & 0xFF == 0xFF) {
 +			verdict = verdict >> 8;
 +			tmpe = ipt_n_entry(e, (uint32_t*)t->data, (t->u.kernel.target->targetsize/sizeof(uint32_t))-1, verdict);
 +			if(unlikely(tmpe == e || tmpe == NULL)) {
