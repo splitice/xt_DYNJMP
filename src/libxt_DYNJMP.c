@@ -35,6 +35,7 @@ static struct xtables_target ct_target_reg[] = {
 		.size          = XT_ALIGN(sizeof(struct xt_DYNJMP_target_info)),
      	.save		   = dynjmp_save,
 		.userspacesize = 0,
+		.help          = dynjmp_help
 	},
 	{
 		.family        = NFPROTO_UNSPEC,
@@ -44,6 +45,7 @@ static struct xtables_target ct_target_reg[] = {
 		.size          = XT_ALIGN(sizeof(struct xt_DYNJMP_target_info)),
      	.save		   = dynjmp_save,
 		.userspacesize = 0,
+		.help          = dynjmp_help
 	}
 };
 

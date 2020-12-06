@@ -24,13 +24,15 @@ static unsigned int
 DYNJMP_tg(struct sk_buff *skb, const struct xt_action_param *par)
 {
 	const struct iphdr *iph;
-	
+	uint8_t upperBytes;
+	unsigned int ret;
+
 	iph = ip_hdr(skb);
 	if(unlikely(iph == NULL)) return NF_DROP;
 	
-	uint8_t upperBytes = ntohl(iph->daddr) & 0xFF;
+	upperBytes = ntohl(iph->daddr) & 0xFF;
 	if(unlikely(upperBytes == 0)) return XT_CONTINUE;
-	unsigned int ret = 0xFF | (upperBytes << 8);
+	ret = 0xFF | (upperBytes << 8);
 	return ret;
 }
 
@@ -38,13 +40,16 @@ static unsigned int
 SYNJMP_tg(struct sk_buff *skb, const struct xt_action_param *par)
 {
 	const struct iphdr *iph;
+	uint8_t upperBytes;
+	unsigned int ret;
+
 	
 	iph = ip_hdr(skb);
 	if(unlikely(iph == NULL)) return NF_DROP;
 	
-	uint8_t upperBytes = ntohl(iph->saddr) & 0xFF;
+	upperBytes = ntohl(iph->saddr) & 0xFF;
 	if(unlikely(upperBytes == 0)) return XT_CONTINUE;
-	unsigned int ret = 0xFF | (upperBytes << 8);
+	ret = 0xFF | (upperBytes << 8);
 	return ret;
 }
 
@@ -85,8 +90,6 @@ static struct xt_target dynjmp_tg_reg[] __read_mostly = {
 
 static int __init xt_ct_tg_init(void)
 {
-	int ret;
-
 	return xt_register_targets(dynjmp_tg_reg, ARRAY_SIZE(dynjmp_tg_reg));
 }
 
