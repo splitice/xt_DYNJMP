@@ -49,6 +49,9 @@ static struct xtables_target ct_target_reg[] = {
 	}
 };
 
+#ifndef _init
+#define _init __attribute__((constructor)) _INIT
+#endif
 void _init(void)
 {
 	xtables_register_targets(ct_target_reg, ARRAY_SIZE(ct_target_reg));
